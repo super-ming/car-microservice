@@ -1,12 +1,14 @@
 package com.udacity.pricing.microservices.entity;
 
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import java.math.BigDecimal;
 
 @Entity
 public class Price {
     private String currency;
     private BigDecimal price;
+    @Id
     private Long vehicleId;
 
     public Price() {
