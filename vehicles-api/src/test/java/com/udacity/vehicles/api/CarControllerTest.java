@@ -1,7 +1,6 @@
 package com.udacity.vehicles.api;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -91,12 +90,11 @@ public class CarControllerTest {
      */
     @Test
     public void listCars() throws Exception {
-        /**
-         * TODO: Add a test to check that the `get` method works by calling
-         *   the whole list of vehicles. This should utilize the car from `getCar()`
-         *   below (the vehicle will be the first in the list).
-         */
-
+        mvc.perform(get(new URI("/cars"))
+                .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded").exists())
+                .andExpect(jsonPath("$._embedded.carList", greaterThanOrEqualTo(1)));
     }
 
     /**
@@ -105,10 +103,14 @@ public class CarControllerTest {
      */
     @Test
     public void findCar() throws Exception {
-        /**
-         * TODO: Add a test to check that the `get` method works by calling
-         *   a vehicle by ID. This should utilize the car from `getCar()` below.
-         */
+        mvc.perform(get(new URI("/cars/1"))
+                .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded").exists())
+                .andExpect(jsonPath("$._embedded.carList", hasSize(1)))
+                .andExpect(jsonPath("$._embedded.carList[0].id", is(1)))
+                .andExpect(jsonPath("$._embedded.carList[0].model", is("Impala")))
+                .andExpect(jsonPath("$._embedded.carList[0].mileage", is(32280)));
     }
 
     /**
@@ -117,11 +119,9 @@ public class CarControllerTest {
      */
     @Test
     public void deleteCar() throws Exception {
-        /**
-         * TODO: Add a test to check whether a vehicle is appropriately deleted
-         *   when the `delete` method is called from the Car Controller. This
-         *   should utilize the car from `getCar()` below.
-         */
+        mvc.perform(delete(new URI("/cars/1"))
+                .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isNoContent());
     }
 
     /**
