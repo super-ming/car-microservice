@@ -6,7 +6,6 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -32,6 +31,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 /**
  * Implements testing of the CarController class.
@@ -94,7 +94,7 @@ public class CarControllerTest {
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded").exists())
-                .andExpect(jsonPath("$._embedded.carList", greaterThanOrEqualTo(1)));
+                .andExpect(jsonPath("$._embedded.carList", hasSize(greaterThanOrEqualTo(1))));
     }
 
     /**
@@ -106,11 +106,11 @@ public class CarControllerTest {
         mvc.perform(get(new URI("/cars/1"))
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded").exists())
-                .andExpect(jsonPath("$._embedded.carList", hasSize(1)))
-                .andExpect(jsonPath("$._embedded.carList[0].id", is(1)))
-                .andExpect(jsonPath("$._embedded.carList[0].model", is("Impala")))
-                .andExpect(jsonPath("$._embedded.carList[0].mileage", is(32280)));
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.condition", is("USED")))
+                .andExpect(jsonPath("$.details.model", is("Impala")))
+                .andExpect(jsonPath("$.details.mileage", is(32280)));
+
     }
 
     /**
