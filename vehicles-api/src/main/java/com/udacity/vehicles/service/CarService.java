@@ -34,7 +34,12 @@ public class CarService {
      * @return a list of all vehicles in the CarRepository
      */
     public List<Car> list() {
-        return repository.findAll();
+        List<Car> allCars = repository.findAll();
+        allCars.forEach(car -> {
+                car.setPrice(priceClient.getPrice(car.getId()));
+                car.setLocation(mapsClient.getAddress(car.getLocation()));
+        });
+        return allCars;
     }
 
     /**
@@ -56,6 +61,7 @@ public class CarService {
      * @return the new/updated car is stored in the repository
      */
     public Car save(Car car) {
+
         if (car.getId() != null) {
             return repository.findById(car.getId())
                     .map(carToBeUpdated -> {
