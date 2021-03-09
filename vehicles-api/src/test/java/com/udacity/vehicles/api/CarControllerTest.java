@@ -3,9 +3,7 @@ package com.udacity.vehicles.api;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -81,7 +79,9 @@ public class CarControllerTest {
                         .content(json.write(car).getJson())
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .accept(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(status().isCreated());
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.details.modelYear", is(2018)));
     }
 
     /**
@@ -122,6 +122,20 @@ public class CarControllerTest {
         mvc.perform(delete(new URI("/cars/1"))
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void updateCar() throws Exception {
+        Car updatedCar = carService.findById(1L);
+        updatedCar.setCondition(Condition.NEW);
+        mvc.perform(
+                put(new URI("/cars/1"))
+                        .content(json.write(updatedCar).getJson())
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(jsonPath("$.condition", is("NEW")));
     }
 
     /**
